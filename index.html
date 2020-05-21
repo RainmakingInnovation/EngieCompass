@@ -1430,6 +1430,8 @@
           filter = 0,
           filterKey = "",
           clientFilter = "All Startups",
+          geoFilter = "All Startups",
+          filters = {type: "All Startups", geotype: "All Startups"}
           logoPath = "",
           titleLogoWidth = 80,
           titleLogoHeight = 50,
@@ -2736,7 +2738,8 @@
                 return "<a href='#'>" + d + "</a>";
               })
               .on("click", function(d) {
-                update_opacity(d);
+                filters.type = d
+                update_opacity();
                 clientFilter = d;
               });
 
@@ -3766,7 +3769,16 @@
                 switchRadial();
               });
               d3.select("#button-17").on("change", function() {
-                //
+                console.log('button')
+                if (geoFilter === "All Startups") {
+                  filters.geotype = "African"
+                  update_opacity()
+                  geoFilter = "African"
+                } else {
+                  filters.geotype = "All Startups"
+                  update_opacity()
+                  geoFilter = "All Startups"
+                }
               });
   
             var CompetitorMode = 0;
@@ -4300,7 +4312,10 @@
         return array;
       }
   
-            function update_opacity(type) {
+            function update_opacity() {
+
+              type = filters.type
+              geotype = filters.geotype
   
               nodes
                 .transition()
@@ -4310,7 +4325,8 @@
                   if (
                     (d["Client Served"] === type || type === "All Startups") &&
                     d["Funding Stage"] !== "Acquired" &&
-                    d.hide === false
+                    d.hide === false &&
+                    (d["Global"] === geotype || geotype === "All Startups")
                   ) {
                     var endR = 2;
                   } else {
@@ -4337,7 +4353,8 @@
                   if (
                     d["Activity/Acquisition Time"] != "" &&
                     CompetitorMode === 1 &&
-                    (d["Client Served"] === type || type === "All Startups")
+                    (d["Client Served"] === type || type === "All Startups") &&
+                    (d["Global"] === geotype || geotype === "All Startups")
                   ) {
                     var endPoints = [
                       [d.x, d.y - 4.7],
@@ -4365,7 +4382,8 @@
                   if (
                     (d["Client Served"] === type || type === "All Startups") &&
                     d["Funding Stage"] === "Acquired" &&
-                    d.hide === false
+                    d.hide === false &&
+                    (d["Global"] === geotype || geotype === "All Startups")
                   ) {
                     var endWidth = 5.5;
                   } else {
@@ -4381,7 +4399,8 @@
                   if (
                     (d["Client Served"] === type || type === "All Startups") &&
                     d["Funding Stage"] === "Acquired" &&
-                    d.hide === false
+                    d.hide === false &&
+                    (d["Global"] === geotype || geotype === "All Startups")
                   ) {
                     var endHeight = 5.5;
                   } else {
@@ -4397,7 +4416,8 @@
                   if (
                     (d["Client Served"] === type || type === "All Startups") &&
                     d["Funding Stage"] === "Acquired" &&
-                    d.hide === false
+                    d.hide === false &&
+                    (d["Global"] === geotype || geotype === "All Startups")
                   ) {
                     var endY = 0;
                   } else {
