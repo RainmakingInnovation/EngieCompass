@@ -1562,8 +1562,13 @@
         d3.csv(
           "https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1580022135&single=true&output=csv"
         ).then(function(data) {
+          d3.csv(
+          "https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1462501778&single=true&output=csv"
+          ).then(function(desc) {
 
           console.log('data', data)
+
+          console.log('desc', desc)
 
               spinner.stop();
               d3.select("#button-16").style("display", "block")
@@ -2402,8 +2407,37 @@
               }
               return valA < valB ? -1 : valA > valB ? 1 : valA >= valB ? 0 : NaN;
             }*/
+
+            var tempOrder = d3.nest()
+              .key(function(d) {
+                return d["Focus Area"]
+              })
+              .sortKeys(function(a,b) {
+                return d3.ascending(a, b)
+              })
+              .entries(desc)
+
+
+            tempOrder.forEach(function(v) {
+              v.values.sort(function(a, b) {
+                return d3.ascending(a["Opp Space"], b["Opp Space"])
+              })
+            })
+
+            var themeOrder = []
+            var focusAreaOrder = []
+            tempOrder.forEach(function(v) {
+              themeOrder.push(v.key)
+              v.values.forEach(function(w) {
+                focusAreaOrder.push(w["Opp Space"].toLowerCase())
+              })
+            })
+
+                console.log('tempOrder', tempOrder)
+                console.log('themeOrder', themeOrder)
+          
             
-            var focusAreaOrder = d3.nest()
+            /*var focusAreaOrder = d3.nest()
               .key(function(d) {
                 return d["Opportunity Space"]
               })
@@ -2413,7 +2447,7 @@
               })
               .map(function(v) {
                 return v.key
-              }).slice(0,12)
+              }).slice(0,12)*/
 
               var focusAreaSort = focusAreaOrder
 
@@ -2694,21 +2728,24 @@
               });
   
             //CHANGE HERE:
-            /*var outerChartPie = d3
+            var outerChartPie = d3
               .pie()
               .value(function(d) {
+                console.log('d', d)
                 var number_of_opp_spaces = [
                   ...new Set(
                     d.value.values.map(function(v) {
-                      return v["Opportunity Space"];
+                      return v["Opp Space"];
                     })
                   )
                 ];
                 return number_of_opp_spaces.length;
               })
-              .sort(themeSort);
+              //.sort(tempOrder);
   
-            var outerChartPieData = outerChartPie(d3.entries(count_by_themes));*/
+            var outerChartPieData = outerChartPie(d3.entries(tempOrder));
+
+            console.log('outerChartPieData', outerChartPieData)
   
             var chartPieData = chartPie(d3.entries(focusAreaSorted))
   
@@ -2759,7 +2796,7 @@
               update_bar(d)
             });
 
-            /*themeFontData = categoryFontObject[0];
+            themeFontData = categoryFontObject[0];
   
             var themeSegments = chartSVG
               .selectAll("theme-segments")
@@ -2824,7 +2861,7 @@
                 .attr("startOffset", "50%")
                 .text(function(d) {
                   return d.data.value.key.toUpperCase();
-                });*/
+                });
   
             var backgroundSegments = chartSVG
               .selectAll("background-segments")
@@ -3598,7 +3635,7 @@
                           radiusSize,
                           nodeData[i].values[j].value
                         )
-                        if (congestion > 10) {
+                        if (congestion > 1) {
                            d.results = assignRandom(
                             tmp_startAngleMin,
                             tmp_endAngleMax,
@@ -3783,7 +3820,7 @@
   
             var CompetitorMode = 0;
 
-            var radiusSize = 2;
+            var radiusSize = 0.1;
 
             var nodes = chartSVG
               .selectAll("nodes")
@@ -6047,7 +6084,7 @@
               }
             }
           });
-
+        })
         });
   
         function round_to_precision(x, precision) {
