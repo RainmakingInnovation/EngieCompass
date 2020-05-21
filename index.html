@@ -72,7 +72,7 @@
         stroke-width: 2px;
       }
 
-      .existing-segments {
+      .mature-segments {
         fill: #dfdfdf;
       }
 
@@ -80,7 +80,7 @@
         fill: #e9e9e9;
       }
 
-      .distant-segments {
+      .nascent-segments {
         fill: #f4f4f4;
       }
 
@@ -471,6 +471,7 @@
         z-index: 1;
       }
 
+        #button-17,
       #button-16 {
         display: none;
       }
@@ -1564,6 +1565,7 @@
 
               spinner.stop();
               d3.select("#button-16").style("display", "block")
+              d3.select("#button-17").style("display", "block")
               d3.select(".dropdown-client").style("display", "inline-block")
               d3.select("#save-button").style("display", "block")
               d3.select(".chart-title").style("display", "")
@@ -1609,6 +1611,9 @@
               return d["Founded"] !== "";
             });
 
+            data = data.filter(function(d) {
+              return +d["Founded"] > 2004;
+            });
             /*
              data = data.filter(function(d) {
               return d["Maturity"] !== "";
@@ -1674,7 +1679,7 @@
                 data.forEach(function(w) {
                   if (w.Country === d.properties.name) {
                     var obj = {
-                      "Company Name": w["Company Name"],
+                      "Startup": w["Startup"],
                       Funding: w["Total funding (US$)"],
                       Website: w["Website"],
                       "Founded": w["Founded"]
@@ -1689,7 +1694,7 @@
                 startup_list.forEach(function(v) {
                   table +=
                     "<tr><td><a href='" + v.Website + "' target='_blank'>" +
-                    v["Company Name"] +
+                    v["Startup"] +
                     "</a><\/td><td>$" +
                       formatFunding(v.Funding) +
                     "<\/td><td>" +
@@ -1790,58 +1795,6 @@
                             var hor = tmp_width - 135;
                             var ver = tmp_height - 345;
                           }
-                          if (i === 12) {
-                            var hor = tmp_width - 75;
-                            var ver = tmp_height - 345;
-                          }
-                          if (i === 13) {
-                            var hor = tmp_width - 0;
-                            var ver = tmp_height - 345;
-                          }
-                          if (i === 14) {
-                            var hor = tmp_width - 0;
-                            var ver = tmp_height - 320;
-                          }
-                          if (i === 15) {
-                            var hor = tmp_width + 30;
-                            var ver = tmp_height - 280;
-                          }
-                          if (i === 16) {
-                            var hor = tmp_width + 30;
-                            var ver = tmp_height - 220;
-                          }
-                          if (i === 17) {
-                            var hor = tmp_width + 35;
-                            var ver = tmp_height - 140;
-                          }
-                          if (i === 18) {
-                            var hor = tmp_width + 45;
-                            var ver = tmp_height - 60;
-                          }
-                          if (i === 19) {
-                            var hor = tmp_width + 45;
-                            var ver = tmp_height - 10;
-                          }
-                          if (i === 20) {
-                            var hor = tmp_width + 45;
-                            var ver = tmp_height - 10;
-                          }
-                          if (i === 21) {
-                            var hor = tmp_width + 25;
-                            var ver = tmp_height + 30;
-                          }
-                          if (i === 22) {
-                            var hor = tmp_width + 25;
-                            var ver = tmp_height + 30;
-                          }
-                          if (i === 23) {
-                            var hor = tmp_width - 5;
-                            var ver = tmp_height + 30;
-                          }
-                          if (i === 24) {
-                            var hor = tmp_width - 5;
-                            var ver = tmp_height + 45;
-                          }
 
                           var tmp_chartSVG = tmp_svg
                           .append("g")
@@ -1849,8 +1802,8 @@
 
                           if (radial === "maturity") {
                             
-                            var tmp_existingSegments = tmp_chartSVG
-                              .selectAll("existing-segments")
+                            var tmp_matureSegments = tmp_chartSVG
+                              .selectAll("mature-segments")
                               .data([v])
                               .enter()
                               .append("path")
@@ -1858,20 +1811,20 @@
                               .attr("class", function(d) {
      
                                 return (
-                                  "existing-segments segment-" +
+                                  "mature-segments segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .attr("id", function(d) {
                                 return (
-                                  "tmp-existing-segment-" +
+                                  "tmp-mature-segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .style("stroke", "white")
                               .style("stroke-width", "2px")
                               .attr("fill", "#DFDFDF") //F4F4F4
-                              .attr("d", existingArc);
+                              .attr("d", matureArc);
           
                             var tmp_emergingSegments = tmp_chartSVG
                               .selectAll("emerging-segments")
@@ -1896,28 +1849,28 @@
                               .attr("fill", "#E9E9E9")
                               .attr("d", emergingArc);
           
-                            var tmp_distantSegments = tmp_chartSVG
-                              .selectAll("distant-segments")
+                            var tmp_nascentSegments = tmp_chartSVG
+                              .selectAll("nascent-segments")
                               .data([v])
                               .enter()
                               .append("path")
                               .style("fill-opacity", 1)
                               .attr("class", function(d) {
                                 return (
-                                  "distant-segments segment-" +
+                                  "nascent-segments segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .attr("id", function(d) {
                                 return (
-                                  "tmp-distant-segment-" +
+                                  "tmp-nascent-segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .style("stroke", "white")
                               .style("stroke-width", "2px")
                               .attr("fill", "#F4F4F4") //DFDFDF
-                              .attr("d", distantArc);
+                              .attr("d", nascentArc);
                           } else {  
                             count_by_year.forEach(function(w) {
                               var tmpArc = d3
@@ -2178,7 +2131,7 @@
                   var extra = [0, 1, 2]
                   heroPopupData.forEach(function(v, i) {
                     extra = extra.splice(1)
-                      if (v["Company Name"] !== "COMPETITOR") {
+                      if (v["Startup"] !== "COMPETITOR") {
                         d3.select("#hs-" + i).style("display", "")
 
                           if (v["Logo URL"] !== "") {
@@ -2275,7 +2228,7 @@
                 data.forEach(function(w) {
                     if (w.Country === d.properties.name) {
                         var obj = {
-                            "Company Name": w["Company Name"],
+                            "Startup": w["Startup"],
                             Funding: w["Total funding (US$)"],
                             Website: w["Website"],
                             'Founded': w["Founded"]
@@ -2447,7 +2400,9 @@
               }
               return valA < valB ? -1 : valA > valB ? 1 : valA >= valB ? 0 : NaN;
             }*/
-            var focusAreaSort = focusAreaOrder
+
+            console.log('data', data)
+            
             var focusAreaOrder = d3.nest()
               .key(function(d) {
                 return d["Opportunity Space"]
@@ -2459,6 +2414,8 @@
               .map(function(v) {
                 return v.key
               }).slice(0,12)
+
+              var focusAreaSort = focusAreaOrder
 
             console.log('focusAreaOrder', focusAreaOrder)
 
@@ -2550,13 +2507,16 @@
               .scaleOrdinal()
               .domain(fundingCategoryRangeUnique)
               .range(colors);
+
+              console.log('data', data)
   
             var focusAreaSorted = d3
               .nest()
               .key(function(d) {
+                
                 return d["Opportunity Space"];
               })
-              .sortKeys(focusAreaSort)
+              //.sortKeys(focusAreaSort)
               .rollup(function(v) {
                 var totalFunding = d3.sum(v, function(d) {
                   return +d["Total funding (US$)"];
@@ -2571,7 +2531,7 @@
               .key(function(d) {
                 return d["Opportunity Space"];
               })
-              .sortKeys(focusAreaSort)
+              //.sortKeys(focusAreaSort)
               .entries(data);
   
             /*var count_by_themes = d3
@@ -2668,9 +2628,9 @@
               } */
   
             var maturity_list = [
-              { name: "Existing", inner: 50, outer: 140 },
+              { name: "Mature", inner: 50, outer: 140 },
               { name: "Emerging", inner: 140, outer: 220 },
-              { name: "Distant", inner: 220, outer: 300 }
+              { name: "Nascent", inner: 220, outer: 300 }
             ];
   
             var backgroundArc = d3
@@ -2678,7 +2638,7 @@
               .innerRadius(maturity_list[0].inner)
               .outerRadius(maturity_list[2].outer);
   
-            var existingArc = d3
+            var matureArc = d3
               .arc()
               .innerRadius(maturity_list[0].inner)
               .outerRadius(maturity_list[0].outer);
@@ -2688,7 +2648,7 @@
               .innerRadius(maturity_list[1].inner)
               .outerRadius(maturity_list[1].outer);
   
-            var distantArc = d3
+            var nascentArc = d3
               .arc()
               .innerRadius(maturity_list[2].inner)
               .outerRadius(maturity_list[2].outer);
@@ -2862,7 +2822,7 @@
                 .outerRadius(v.outer);
   
               var tmpSegment = chartSVG
-                .selectAll("existing-segments")
+                .selectAll("mature-segments")
                 .data(chartPieData)
                 .enter()
                 .append("path")
@@ -3399,35 +3359,35 @@
                 .text("Maturity")
                 .attr("fill", "white"); */
   
-            var existingLabelRadius = maturity_list[0].outer - 15;
+            var matureLabelRadius = maturity_list[0].outer - 15;
             var emergingLabelRadius = maturity_list[1].outer - 15;
-            var distantLabelRadius = maturity_list[2].outer - 15;
+            var nascentLabelRadius = maturity_list[2].outer - 15;
   
-            var existingLabel = chartSVG
+            var matureLabel = chartSVG
               .append("g")
               .classed("maturity-labels", true);
   
-            existingLabel
+            matureLabel
               .append("def")
               .append("path")
-              .attr("id", "existing-label-path")
+              .attr("id", "mature-label-path")
               .attr(
                 "d",
                 "m " +
-                  -existingLabelRadius +
+                  -matureLabelRadius +
                   " 0 a 50 50 0 1 1 " +
-                  2 * existingLabelRadius +
+                  2 * matureLabelRadius +
                   " 0"
               );
   
-            existingLabel
+            matureLabel
               .append("text")
               .attr("class", "maturity-label-text")
-              .attr("id", "existing-label-path-text")
+              .attr("id", "mature-label-path-text")
               .append("textPath")
-              .attr("xlink:href", "#existing-label-path")
+              .attr("xlink:href", "#mature-label-path")
               .attr("startOffset", "50%")
-              .text("Existing");
+              .text("Mature");
   
             var emergingLabel = chartSVG
               .append("g")
@@ -3477,36 +3437,36 @@
               d.fn = this["year" + d.key + "Label"];
             });
   
-            var distantLabel = chartSVG
+            var nascentLabel = chartSVG
               .append("g")
               .classed("maturity-labels", true);
   
-            distantLabel
+            nascentLabel
               .append("def")
               .append("path")
-              .attr("id", "distant-label-path")
+              .attr("id", "nascent-label-path")
               .attr(
                 "d",
                 "m " +
-                  -distantLabelRadius +
+                  -nascentLabelRadius +
                   " 0 a 50 50 0 1 1 " +
-                  2 * distantLabelRadius +
+                  2 * nascentLabelRadius +
                   " 0"
               );
   
-            distantLabel
+            nascentLabel
               .append("text")
               .attr("class", "maturity-label-text")
-              .attr("id", "distant-label-path-text")
+              .attr("id", "nascent-label-path-text")
               .append("textPath")
-              .attr("xlink:href", "#distant-label-path")
+              .attr("xlink:href", "#nascent-label-path")
               .attr("startOffset", "50%")
-              .text("Distant");
+              .text("Nascent");
   
             maturity_list_elements = [
-              { name: "Existing", fn: existingLabel },
+              { name: "Mature", fn: matureLabel },
               { name: "Emerging", fn: emergingLabel },
-              { name: "Distant", fn: distantLabel }
+              { name: "Nascent", fn: nascentLabel }
             ];
   
             maturity_list.forEach(function(d) {
@@ -3783,6 +3743,9 @@
               d3.select("#button-16").on("change", function() {
                 switchRadial();
               });
+              d3.select("#button-17").on("change", function() {
+                //
+              });
   
             var CompetitorMode = 0;
 
@@ -3794,7 +3757,7 @@
               .enter()
               .append("a")
               .attr("xlink:href", function(d) {
-                return formatURL(d.Website)
+                return formatURL(d.URL)
               })
               .attr("target", "_blank")
               .append("circle")
@@ -3833,13 +3796,13 @@
               .enter()
               .append("a")
               .attr("xlink:href", function(d) {
-                return formatURL(d.Website)
+                return formatURL(d.URL)
               })
               .attr("target", "_blank")
               .append("polygon")
               .attr("class", "nodes nodes-activity")
               .attr("id", function(d) {
-                return d["Company Name"].toLowerCase().replace(/ /g, "-");
+                return d["Startup"].toLowerCase().replace(/ /g, "-");
               })
               .attr("points", function(d) {
                 var points = [
@@ -3862,13 +3825,13 @@
               .enter()
               .append("a")
               .attr("xlink:href", function(d) {
-                return formatURL(d.Website)
+                return formatURL(d.URL)
               })
               .attr("target", "_blank")
               .append("rect")
               .attr("class", "nodes nodes-acquired")
               .attr("id", function(d) {
-                return d["Company Name"].toLowerCase().replace(/ /g, "-");
+                return d["Startup"].toLowerCase().replace(/ /g, "-");
               })
               .attr("width", function(d) {
                 if (d["Funding Stage"] === "Acquired") {
@@ -4749,7 +4712,7 @@
 
                                 if (type === "Maturity") {
                   var maturityOrder = [
-                  "Existing", "Emerging", "Distant"]
+                  "Mature", "Emerging", "Nascent"]
                   function maturitySort(a, b) {
                     
                     for (i = 0; i < maturityOrder.length; i++) {
@@ -5192,7 +5155,7 @@
                 .key(function(d) {
                   return d["Opportunity Space"];
                 })
-                .sortKeys(focusAreaSort)
+                //.sortKeys(focusAreaSort)
                 .entries(
                   data.filter(function(d) {
                     if (clientFilter !== "All Startups") {
@@ -5300,14 +5263,14 @@
             }
 
             function showOppSpaceTooltip(segment_data, clicked = "") {              
-              desc.forEach(function(v) {
+              /*desc.forEach(function(v) {
                 if (
                   segment_data.data.value.key ===
                   v["Opportunity Space"].toLowerCase().replace(/\//g, "_")
                 ) {
                   segmentDesc = v.Description;
                 }
-              });
+              });*/
               var numberOfStartups = 0;
               var segmentFunding = 0;
               for (i = 0; i < count_by_focus_area.length; i++) {
@@ -5333,12 +5296,12 @@
                 }
               d3.select("#opp-space-tooltip-container").style("display", "block")
               d3.select(".opp-space-tooltip-title").text((segment_data.data.value.key).toUpperCase().replace(/_/g, "/"))
-              d3.select("#ostt-1").text(segmentDesc)
+              //d3.select("#ostt-1").text(segmentDesc)
               d3.select("#ostt-3").text(formatFunding(segmentFunding))
               d3.select("#ostt-5").text(numberOfStartups)
               d3.select("#ostt-7").text(formatFunding(avgFunding))
-              d3.select("#ostt-8").text(theme.toUpperCase())
-              d3.select("#ostt-9").text(themeDesc)
+              //d3.select("#ostt-8").text(theme.toUpperCase())
+              //d3.select("#ostt-9").text(themeDesc)
             }
 
             function formatURL(url) {
@@ -5350,7 +5313,7 @@
             }
 
             function showNodeTooltip(d) {
-              d3.select(".node-tooltip-title").text(d["Company Name"]);
+              d3.select(".node-tooltip-title").text(d["Startup"]);
               d3.select(".node-tooltip-funding").text("Total Funding: $" + formatFunding(d["Total funding (US$)"]));
               d3.select(".node-tooltip-description").text(d["Business Description"].replace(/�۪/g, "'"));
 
@@ -5427,7 +5390,7 @@
                   var x = d3.select(this).attr("x");
                   return hover_info(
                     data["Business Description"],
-                    data["Company Name"],
+                    data["Startup"],
                     dateForMode(data),
                     data["Total funding (US$)"],
                     x
@@ -5494,7 +5457,7 @@
                   var x = d3.select(this).attr("x");
                   return hover_info(
                     data["Business Description"],
-                    data["Company Name"],
+                    data["Startup"],
                     dateForMode(data),
                     data["Total funding (US$)"],
                     x
@@ -5658,28 +5621,28 @@
                     .attr("transform", "translate(" + hor + "," + ver + ")");
   
                   if (radial === "maturity") {
-                    var tmp_existingSegments = tmp_chartSVG
-                      .selectAll("existing-segments")
+                    var tmp_matureSegments = tmp_chartSVG
+                      .selectAll("mature-segments")
                       .data([chartPieData[i]])
                       .enter()
                       .append("path")
                       .style("fill-opacity", 1)
                       .attr("class", function(d) {
                         return (
-                          "existing-segments segment-" +
+                          "mature-segments segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .attr("id", function(d) {
                         return (
-                          "tmp-existing-segment-" +
+                          "tmp-mature-segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .style("stroke", "white")
                       .style("stroke-width", "2px")
                       .attr("fill", "#DFDFDF") //F4F4F4
-                      .attr("d", existingArc);
+                      .attr("d", matureArc);
   
                     var tmp_emergingSegments = tmp_chartSVG
                       .selectAll("emerging-segments")
@@ -5704,28 +5667,28 @@
                       .attr("fill", "#E9E9E9")
                       .attr("d", emergingArc);
   
-                    var tmp_distantSegments = tmp_chartSVG
-                      .selectAll("distant-segments")
+                    var tmp_nascentSegments = tmp_chartSVG
+                      .selectAll("nascent-segments")
                       .data([chartPieData[i]])
                       .enter()
                       .append("path")
                       .style("fill-opacity", 1)
                       .attr("class", function(d) {
                         return (
-                          "distant-segments segment-" +
+                          "nascent-segments segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .attr("id", function(d) {
                         return (
-                          "tmp-distant-segment-" +
+                          "tmp-nascent-segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .style("stroke", "white")
                       .style("stroke-width", "2px")
                       .attr("fill", "#F4F4F4") //DFDFDF
-                      .attr("d", distantArc);
+                      .attr("d", nascentArc);
                   } else {
                     count_by_year.forEach(function(v) {
                       var tmpArc = d3
