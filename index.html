@@ -1604,7 +1604,7 @@
 
 
             data = data.filter(function(d) {
-              return d["Opportunity Space"] !== "";
+              return d["Opportunity Space"] !== "" && d["Opportunity Space"] !== "x";
             });
   
             data = data.filter(function(d) {
@@ -2400,8 +2400,6 @@
               }
               return valA < valB ? -1 : valA > valB ? 1 : valA >= valB ? 0 : NaN;
             }*/
-
-            console.log('data', data)
             
             var focusAreaOrder = d3.nest()
               .key(function(d) {
