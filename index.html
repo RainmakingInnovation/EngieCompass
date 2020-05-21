@@ -1677,7 +1677,7 @@
   
                 startup_list = [];
                 data.forEach(function(w) {
-                  if (w.Country === d.properties.name) {
+                  if (w.Location === d.properties.name) {
                     var obj = {
                       "Startup": w["Startup"],
                       Funding: w["Total funding (US$)"],
@@ -1748,52 +1748,52 @@
                           .attr("height", tmp_height);
 
                           if (i === 0) {
-                            var hor = tmp_width - 90
+                            var hor = tmp_width - 170
                             var ver = tmp_height + 45;
                           }
                           if (i === 1) {
-                            var hor = tmp_width - 210;
-                            var ver = tmp_height + 70;
+                            var hor = tmp_width - 290;
+                            var ver = tmp_height + 20;
                           }
                           if (i === 2) {
-                            var hor = tmp_width - 220;
-                            var ver = tmp_height + 20;
-                          }
-                          if (i === 3) {
-                            var hor = tmp_width - 285;
-                            var ver = tmp_height + 20;
-                          }
-                          if (i === 4) {
-                            var hor = tmp_width - 330;
-                            var ver = tmp_height - 0;
-                          }
-                          if (i === 5) {
-                            var hor = tmp_width - 330;
+                            var hor = tmp_width - 340;
                             var ver = tmp_height - 20;
                           }
+                          if (i === 3) {
+                            var hor = tmp_width - 335;
+                            var ver = tmp_height - 170;
+                          }
+                          if (i === 4) {
+                            var hor = tmp_width - 290;
+                            var ver = tmp_height - 290;
+                          }
+                          if (i === 5) {
+                            var hor = tmp_width - 180;
+                            var ver = tmp_height - 330;
+                          }
                           if (i === 6) {
-                            var hor = tmp_width - 355;
-                            var ver = tmp_height - 70;
+                            var hor = tmp_width - 15;
+                            var ver = tmp_height - 330;
                           }
                           if (i === 7) {
-                            var hor = tmp_width - 320;
-                            var ver = tmp_height - 150;
+                            var hor = tmp_width + 20;
+                            var ver = tmp_height - 290;
                           }
                           if (i === 8) {
-                            var hor = tmp_width - 300;
-                            var ver = tmp_height - 210;
+                            var hor = tmp_width + 40;
+                            var ver = tmp_height - 180;
                           }
                           if (i === 9) {
-                            var hor = tmp_width - 265;
-                            var ver = tmp_height - 275;
+                         var hor = tmp_width + 40;
+                            var ver = tmp_height - 10;
                           }
                           if (i === 10) {
-                            var hor = tmp_width - 205;
-                            var ver = tmp_height - 305;
+                            var hor = tmp_width + 25;
+                            var ver = tmp_height + 25;
                           }
                           if (i === 11) {
-                            var hor = tmp_width - 135;
-                            var ver = tmp_height - 345;
+                            var hor = tmp_width - 15;
+                            var ver = tmp_height + 45;
                           }
 
                           var tmp_chartSVG = tmp_svg
@@ -2150,7 +2150,7 @@
                                         hs_website += "<a href='" + v["Website"] + "' target='_blank'>" + v["Website"] + "<\/a>"
 
                                     var hs_location = "<span style='font-family: Graphik Bold'>Location:<\/span> "
-                                        hs_location += v["Country"]
+                                        hs_location += v["Location"]
 
                                         var hs_round = "<span style='font-family: Graphik Bold'>Funding Round:<\/span> "
                                             hs_round += v["Funding Stage"]
@@ -2226,7 +2226,7 @@
 
                 bar_data = [];
                 data.forEach(function(w) {
-                    if (w.Country === d.properties.name) {
+                    if (w.Location === d.properties.name) {
                         var obj = {
                             "Startup": w["Startup"],
                             Funding: w["Total funding (US$)"],
@@ -2262,7 +2262,7 @@
               data_country = d3
                 .nest()
                 .key(function(d) {
-                  return d.Country;
+                  return d.Location;
                 })
                 .entries(data);
   
@@ -2275,7 +2275,7 @@
 
               data.forEach(function(v) {
                 json.features.forEach(function(w) {
-                  if (v["Country"] === w.properties.name) {
+                  if (v["Location"] === w.properties.name) {
                     v.json_country = w.properties.name;
                   }
                 });
@@ -2296,7 +2296,7 @@
               json.features.forEach(function(w) {
                 w.properties.startups = 0;
                 data.forEach(function(v) {
-                  if (v["Country"] === w.properties.name) {
+                  if (v["Location"] === w.properties.name) {
                     v.json_country = w.properties.name;
                     w.properties.startups += 1;
                   }
@@ -2514,7 +2514,19 @@
                 
                 return d["Opportunity Space"];
               })
-              //.sortKeys(focusAreaSort)
+              .sortKeys(function(a, b) {
+                let aVal = 0
+                let bVal = 0
+                focusAreaSort.forEach(function(v, index) {
+                  if (a === v) {
+                    aVal = index
+                  }
+                  if (b === v) {
+                    bVal = index
+                  }
+                })
+                return d3.ascending(aVal, bVal)
+              })
               .rollup(function(v) {
                 var totalFunding = d3.sum(v, function(d) {
                   return +d["Total funding (US$)"];
@@ -2529,7 +2541,19 @@
               .key(function(d) {
                 return d["Opportunity Space"];
               })
-              //.sortKeys(focusAreaSort)
+              .sortKeys(function(a, b) {
+                let aVal = 0
+                let bVal = 0
+                focusAreaSort.forEach(function(v, index) {
+                  if (a === v) {
+                    aVal = index
+                  }
+                  if (b === v) {
+                    bVal = index
+                  }
+                })
+                return d3.ascending(aVal, bVal)
+              })
               .entries(data);
   
             /*var count_by_themes = d3
@@ -2626,9 +2650,9 @@
               } */
   
             var maturity_list = [
-              { name: "Nascent", inner: 50, outer: 140 },
-              { name: "Emerging", inner: 140, outer: 220 },
-              { name: "Mature", inner: 220, outer: 300 }
+              { name: "Nascent", inner: 50, outer: 180 },
+              { name: "Emerging", inner: 180, outer: 240 },
+              { name: "Mature", inner: 240, outer: 300 }
             ];
   
             var backgroundArc = d3
@@ -5153,7 +5177,19 @@
                 .key(function(d) {
                   return d["Opportunity Space"];
                 })
-                //.sortKeys(focusAreaSort)
+              .sortKeys(function(a, b) {
+                let aVal = 0
+                let bVal = 0
+                focusAreaSort.forEach(function(v, index) {
+                  if (a === v) {
+                    aVal = index
+                  }
+                  if (b === v) {
+                    bVal = index
+                  }
+                })
+                return d3.ascending(aVal, bVal)
+              })
                 .entries(
                   data.filter(function(d) {
                     if (clientFilter !== "All Startups") {
@@ -5514,52 +5550,52 @@
                     .attr("height", tmp_height);
   
                           if (i === 0) {
-                            var hor = tmp_width - 90
+                            var hor = tmp_width - 170
                             var ver = tmp_height + 45;
                           }
                           if (i === 1) {
-                            var hor = tmp_width - 180;
-                            var ver = tmp_height + 40;
+                            var hor = tmp_width - 290;
+                            var ver = tmp_height + 20;
                           }
                           if (i === 2) {
-                            var hor = tmp_width - 220;
-                            var ver = tmp_height + 20;
-                          }
-                          if (i === 3) {
-                            var hor = tmp_width - 285;
-                            var ver = tmp_height + 20;
-                          }
-                          if (i === 4) {
-                            var hor = tmp_width - 330;
-                            var ver = tmp_height - 0;
-                          }
-                          if (i === 5) {
-                            var hor = tmp_width - 330;
+                            var hor = tmp_width - 340;
                             var ver = tmp_height - 20;
                           }
+                          if (i === 3) {
+                            var hor = tmp_width - 335;
+                            var ver = tmp_height - 170;
+                          }
+                          if (i === 4) {
+                            var hor = tmp_width - 290;
+                            var ver = tmp_height - 290;
+                          }
+                          if (i === 5) {
+                            var hor = tmp_width - 180;
+                            var ver = tmp_height - 330;
+                          }
                           if (i === 6) {
-                            var hor = tmp_width - 355;
-                            var ver = tmp_height - 70;
+                            var hor = tmp_width - 15;
+                            var ver = tmp_height - 330;
                           }
                           if (i === 7) {
-                            var hor = tmp_width - 320;
-                            var ver = tmp_height - 150;
+                            var hor = tmp_width + 20;
+                            var ver = tmp_height - 290;
                           }
                           if (i === 8) {
-                            var hor = tmp_width - 300;
-                            var ver = tmp_height - 210;
+                            var hor = tmp_width + 40;
+                            var ver = tmp_height - 180;
                           }
                           if (i === 9) {
-                            var hor = tmp_width - 265;
-                            var ver = tmp_height - 275;
+                         var hor = tmp_width + 40;
+                            var ver = tmp_height - 10;
                           }
                           if (i === 10) {
-                            var hor = tmp_width - 205;
-                            var ver = tmp_height - 305;
+                            var hor = tmp_width + 25;
+                            var ver = tmp_height + 25;
                           }
                           if (i === 11) {
-                            var hor = tmp_width - 135;
-                            var ver = tmp_height - 345;
+                            var hor = tmp_width - 15;
+                            var ver = tmp_height + 45;
                           }
   
                   var tmp_chartSVG = tmp_svg
