@@ -73,7 +73,7 @@
       }
 
       .mature-segments {
-        fill: #dfdfdf;
+        fill: #f4f4f4;
       }
 
       .emerging-segments {
@@ -81,7 +81,7 @@
       }
 
       .nascent-segments {
-        fill: #f4f4f4;
+        fill: #dfdfdf;
       }
 
       .segment-band {
@@ -1752,8 +1752,8 @@
                             var ver = tmp_height + 45;
                           }
                           if (i === 1) {
-                            var hor = tmp_width - 180;
-                            var ver = tmp_height + 40;
+                            var hor = tmp_width - 210;
+                            var ver = tmp_height + 70;
                           }
                           if (i === 2) {
                             var hor = tmp_width - 220;
@@ -1802,8 +1802,8 @@
 
                           if (radial === "maturity") {
                             
-                            var tmp_matureSegments = tmp_chartSVG
-                              .selectAll("mature-segments")
+                            var tmp_nascentSegments = tmp_chartSVG
+                              .selectAll("nascent-segments")
                               .data([v])
                               .enter()
                               .append("path")
@@ -1811,20 +1811,20 @@
                               .attr("class", function(d) {
      
                                 return (
-                                  "mature-segments segment-" +
+                                  "nascent-segments segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .attr("id", function(d) {
                                 return (
-                                  "tmp-mature-segment-" +
+                                  "tmp-nascent-segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .style("stroke", "white")
                               .style("stroke-width", "2px")
                               .attr("fill", "#DFDFDF") //F4F4F4
-                              .attr("d", matureArc);
+                              .attr("d", nascentArc);
           
                             var tmp_emergingSegments = tmp_chartSVG
                               .selectAll("emerging-segments")
@@ -1849,28 +1849,28 @@
                               .attr("fill", "#E9E9E9")
                               .attr("d", emergingArc);
           
-                            var tmp_nascentSegments = tmp_chartSVG
-                              .selectAll("nascent-segments")
+                            var tmp_matureSegments = tmp_chartSVG
+                              .selectAll("mature-segments")
                               .data([v])
                               .enter()
                               .append("path")
                               .style("fill-opacity", 1)
                               .attr("class", function(d) {
                                 return (
-                                  "nascent-segments segment-" +
+                                  "mature-segments segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .attr("id", function(d) {
                                 return (
-                                  "tmp-nascent-segment-" +
+                                  "tmp-mature-segment-" +
                                   d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                                 );
                               })
                               .style("stroke", "white")
                               .style("stroke-width", "2px")
                               .attr("fill", "#F4F4F4") //DFDFDF
-                              .attr("d", nascentArc);
+                              .attr("d", matureArc);
                           } else {  
                             count_by_year.forEach(function(w) {
                               var tmpArc = d3
@@ -2626,9 +2626,9 @@
               } */
   
             var maturity_list = [
-              { name: "Mature", inner: 50, outer: 140 },
+              { name: "Nascent", inner: 50, outer: 140 },
               { name: "Emerging", inner: 140, outer: 220 },
-              { name: "Nascent", inner: 220, outer: 300 }
+              { name: "Mature", inner: 220, outer: 300 }
             ];
   
             var backgroundArc = d3
@@ -2636,7 +2636,7 @@
               .innerRadius(maturity_list[0].inner)
               .outerRadius(maturity_list[2].outer);
   
-            var matureArc = d3
+            var nascentArc = d3
               .arc()
               .innerRadius(maturity_list[0].inner)
               .outerRadius(maturity_list[0].outer);
@@ -2646,7 +2646,7 @@
               .innerRadius(maturity_list[1].inner)
               .outerRadius(maturity_list[1].outer);
   
-            var nascentArc = d3
+            var matureArc = d3
               .arc()
               .innerRadius(maturity_list[2].inner)
               .outerRadius(maturity_list[2].outer);
@@ -2946,9 +2946,9 @@
                   labelMouseOut();
                 }
               })
-              /*.on("click", function(d) {
+              .on("click", function(d) {
                   update_popup(d)
-              });*/
+              }); 
 
               var oppSpaceLabels = chartSVG
                 .selectAll(".opp-space-label-text")
@@ -3357,35 +3357,35 @@
                 .text("Maturity")
                 .attr("fill", "white"); */
   
-            var matureLabelRadius = maturity_list[0].outer - 15;
+            var nascentLabelRadius = maturity_list[0].outer - 15;
             var emergingLabelRadius = maturity_list[1].outer - 15;
-            var nascentLabelRadius = maturity_list[2].outer - 15;
+            var matureLabelRadius = maturity_list[2].outer - 15;
   
-            var matureLabel = chartSVG
+            var nascentLabel = chartSVG
               .append("g")
               .classed("maturity-labels", true);
   
-            matureLabel
+            nascentLabel
               .append("def")
               .append("path")
-              .attr("id", "mature-label-path")
+              .attr("id", "nascent-label-path")
               .attr(
                 "d",
                 "m " +
-                  -matureLabelRadius +
+                  -nascentLabelRadius +
                   " 0 a 50 50 0 1 1 " +
-                  2 * matureLabelRadius +
+                  2 * nascentLabelRadius +
                   " 0"
               );
   
-            matureLabel
+            nascentLabel
               .append("text")
               .attr("class", "maturity-label-text")
-              .attr("id", "mature-label-path-text")
+              .attr("id", "nascent-label-path-text")
               .append("textPath")
-              .attr("xlink:href", "#mature-label-path")
+              .attr("xlink:href", "#nascent-label-path")
               .attr("startOffset", "50%")
-              .text("Mature");
+              .text("Nascent");
   
             var emergingLabel = chartSVG
               .append("g")
@@ -3435,36 +3435,36 @@
               d.fn = this["year" + d.key + "Label"];
             });
   
-            var nascentLabel = chartSVG
+            var matureLabel = chartSVG
               .append("g")
               .classed("maturity-labels", true);
   
-            nascentLabel
+            matureLabel
               .append("def")
               .append("path")
-              .attr("id", "nascent-label-path")
+              .attr("id", "mature-label-path")
               .attr(
                 "d",
                 "m " +
-                  -nascentLabelRadius +
+                  -matureLabelRadius +
                   " 0 a 50 50 0 1 1 " +
-                  2 * nascentLabelRadius +
+                  2 * matureLabelRadius +
                   " 0"
               );
   
-            nascentLabel
+            matureLabel
               .append("text")
               .attr("class", "maturity-label-text")
-              .attr("id", "nascent-label-path-text")
+              .attr("id", "mature-label-path-text")
               .append("textPath")
-              .attr("xlink:href", "#nascent-label-path")
+              .attr("xlink:href", "#mature-label-path")
               .attr("startOffset", "50%")
-              .text("Nascent");
+              .text("Mature");
   
             maturity_list_elements = [
-              { name: "Mature", fn: matureLabel },
+              { name: "Nascent", fn: nascentLabel },
               { name: "Emerging", fn: emergingLabel },
-              { name: "Nascent", fn: nascentLabel }
+              { name: "Mature", fn: matureLabel }
             ];
   
             maturity_list.forEach(function(d) {
@@ -4710,7 +4710,7 @@
 
                                 if (type === "Maturity") {
                   var maturityOrder = [
-                  "Mature", "Emerging", "Nascent"]
+                  "Nascent", "Emerging", "Mature"]
                   function maturitySort(a, b) {
                     
                     for (i = 0; i < maturityOrder.length; i++) {
@@ -5522,15 +5522,15 @@
                             var ver = tmp_height + 40;
                           }
                           if (i === 2) {
-                            var hor = tmp_width - 235;
-                            var ver = tmp_height + 30;
+                            var hor = tmp_width - 220;
+                            var ver = tmp_height + 20;
                           }
                           if (i === 3) {
                             var hor = tmp_width - 285;
                             var ver = tmp_height + 20;
                           }
                           if (i === 4) {
-                            var hor = tmp_width - 320;
+                            var hor = tmp_width - 330;
                             var ver = tmp_height - 0;
                           }
                           if (i === 5) {
@@ -5538,16 +5538,16 @@
                             var ver = tmp_height - 20;
                           }
                           if (i === 6) {
-                            var hor = tmp_width - 335;
+                            var hor = tmp_width - 355;
                             var ver = tmp_height - 70;
                           }
                           if (i === 7) {
-                            var hor = tmp_width - 325;
+                            var hor = tmp_width - 320;
                             var ver = tmp_height - 150;
                           }
                           if (i === 8) {
                             var hor = tmp_width - 300;
-                            var ver = tmp_height - 230;
+                            var ver = tmp_height - 210;
                           }
                           if (i === 9) {
                             var hor = tmp_width - 265;
@@ -5555,63 +5555,11 @@
                           }
                           if (i === 10) {
                             var hor = tmp_width - 205;
-                            var ver = tmp_height - 310;
+                            var ver = tmp_height - 305;
                           }
                           if (i === 11) {
                             var hor = tmp_width - 135;
-                            var ver = tmp_height - 335;
-                          }
-                          if (i === 12) {
-                            var hor = tmp_width - 75;
-                            var ver = tmp_height - 350;
-                          }
-                          if (i === 13) {
-                            var hor = tmp_width - 0;
-                            var ver = tmp_height - 330;
-                          }
-                          if (i === 14) {
-                            var hor = tmp_width - 0;
-                            var ver = tmp_height - 310;
-                          }
-                          if (i === 15) {
-                            var hor = tmp_width + 15;
-                            var ver = tmp_height - 280;
-                          }
-                          if (i === 16) {
-                            var hor = tmp_width + 30;
-                            var ver = tmp_height - 220;
-                          }
-                          if (i === 17) {
-                            var hor = tmp_width + 35;
-                            var ver = tmp_height - 140;
-                          }
-                          if (i === 18) {
-                            var hor = tmp_width + 45;
-                            var ver = tmp_height - 90;
-                          }
-                          if (i === 19) {
-                            var hor = tmp_width + 35;
-                            var ver = tmp_height - 10;
-                          }
-                          if (i === 20) {
-                            var hor = tmp_width + 30;
-                            var ver = tmp_height - 10;
-                          }
-                          if (i === 21) {
-                            var hor = tmp_width + 25;
-                            var ver = tmp_height + 10;
-                          }
-                          if (i === 22) {
-                            var hor = tmp_width + 5;
-                            var ver = tmp_height + 30;
-                          }
-                          if (i === 23) {
-                            var hor = tmp_width - 5;
-                            var ver = tmp_height + 40;
-                          }
-                          if (i === 24) {
-                            var hor = tmp_width - 5;
-                            var ver = tmp_height + 45;
+                            var ver = tmp_height - 345;
                           }
   
                   var tmp_chartSVG = tmp_svg
@@ -5619,28 +5567,28 @@
                     .attr("transform", "translate(" + hor + "," + ver + ")");
   
                   if (radial === "maturity") {
-                    var tmp_matureSegments = tmp_chartSVG
-                      .selectAll("mature-segments")
+                    var tmp_nascentSegments = tmp_chartSVG
+                      .selectAll("nascent-segments")
                       .data([chartPieData[i]])
                       .enter()
                       .append("path")
                       .style("fill-opacity", 1)
                       .attr("class", function(d) {
                         return (
-                          "mature-segments segment-" +
+                          "nascent-segments segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .attr("id", function(d) {
                         return (
-                          "tmp-mature-segment-" +
+                          "tmp-nascent-segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .style("stroke", "white")
                       .style("stroke-width", "2px")
                       .attr("fill", "#DFDFDF") //F4F4F4
-                      .attr("d", matureArc);
+                      .attr("d", nascentArc);
   
                     var tmp_emergingSegments = tmp_chartSVG
                       .selectAll("emerging-segments")
@@ -5665,28 +5613,28 @@
                       .attr("fill", "#E9E9E9")
                       .attr("d", emergingArc);
   
-                    var tmp_nascentSegments = tmp_chartSVG
-                      .selectAll("nascent-segments")
+                    var tmp_matureSegments = tmp_chartSVG
+                      .selectAll("mature-segments")
                       .data([chartPieData[i]])
                       .enter()
                       .append("path")
                       .style("fill-opacity", 1)
                       .attr("class", function(d) {
                         return (
-                          "nascent-segments segment-" +
+                          "mature-segments segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .attr("id", function(d) {
                         return (
-                          "tmp-nascent-segment-" +
+                          "tmp-mature-segment-" +
                           d.data.value.key.replace(/ /g, "-").replace(/&/g, "and")
                         );
                       })
                       .style("stroke", "white")
                       .style("stroke-width", "2px")
                       .attr("fill", "#F4F4F4") //DFDFDF
-                      .attr("d", nascentArc);
+                      .attr("d", matureArc);
                   } else {
                     count_by_year.forEach(function(v) {
                       var tmpArc = d3
