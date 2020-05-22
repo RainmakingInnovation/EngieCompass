@@ -2244,7 +2244,8 @@
                             "Startup": w["Startup"],
                             Funding: w["Total funding (US$)"],
                             Website: w["Website"],
-                            'Founded': w["Founded"]
+                            'Founded': w["Founded"],
+                            'Maturity': w["Maturity"]
                           };
                           bar_data.push(obj);
                     }
@@ -4500,7 +4501,15 @@
                     {'name': '100M+', 'lower_limit': 100000000, 'upper_limit': 100000000000, 'startups': 0},
                     ]
 
+                    
+
                     bar_data.forEach(function(v) {
+                      console.log('v', v)
+                      if (v.Funding != 0) {
+                        if (v.Funding.slice(0,1) == "$") {
+                          v.Funding = v.Funding.slice(1)
+                        }
+                      }
                         fundHist.forEach(function(w) {
                             if (v.Funding === "n/a") {
                                 v.Funding = 0
@@ -4604,16 +4613,16 @@
                     var yearHist = []
                     var years = []
                     bar_data.forEach(function(v) {
-                      if (years.indexOf(+v.Year) < 0) {
-                        var yearVal = +v.Year
+                      if (years.indexOf(+v.Founded) < 0) {
+                        var yearVal = +v.Founded
                         yearHist.push({'Year': yearVal, 'startups': 0})
-                        years.push(+v.Year)
+                        years.push(+v.Founded)
                       } 
                     })
 
                     bar_data.forEach(function(v) {
                       yearHist.forEach(function(w) {
-                        if (+v.Year === w.Year) {
+                        if (+v.Founded === w.Year) {
                           w.startups += 1
                         }
                       })
@@ -4800,6 +4809,7 @@
                 }
 
                   if (type === "Maturity") {
+                    console.log('bar_data', bar_data)
                   var maturityOrder = [
                   "Nascent", "Emerging", "Mature"]
                   function maturitySort(a, b) {
@@ -4826,6 +4836,8 @@
                   .entries(bar_data.filter(function(d) {
                     return d.Maturity != ""
                   }) )
+
+                  console.log('maturity_data', maturity_data)
                   
 
                   var maxVal = d3.max(maturity_data, function(d) {
