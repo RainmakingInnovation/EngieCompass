@@ -49,7 +49,7 @@
       }
 
       #save-button-container {
-        margin-top: 0px;
+        margin-top: 30px;
         text-align: center;
       }
 
@@ -231,7 +231,7 @@
       }
 
       #switch-button:hover {
-        background-color: #132A54;
+        background-color: #247DC5;
       }
 
       #switch-button-label {
@@ -305,7 +305,7 @@
 
       /* Change the background color of the dropdown button when the dropdown content is shown */
       .dropdown-client:hover .dropbtn {
-        background-color: #132A54;
+        background-color: #247DC5;
       }
 
       .switch-button {
@@ -337,7 +337,7 @@
 
       #map-button:hover,
       #save-button:hover {
-        background-color: #132A54;
+        background-color: #247DC5;
       }
 
       .switch {
@@ -581,8 +581,8 @@
         position: fixed;
         width: 380px;
         height: 100vh;
-        background-color: #000000;
-        border-left: 2px solid #454545;
+        background-color: #F4F4F4;
+        border-left: 2px solid #DCDCDC;
         right: 0px;
         top: 0px;
       }
@@ -600,7 +600,7 @@
       }
 
       #chart-button:hover {
-        background-color: #132A54;
+        background-color: #247DC5;
       }
 
       .map-tooltip {
@@ -639,10 +639,10 @@
         max-height: 300px;
         overflow: scroll;
         font-family: "Graphik Regular";
-        background-color: black;
-        color: white;
-        border: 1px solid #787878;
+        background-color: white;
+        color: #313131;
         padding: 10px;
+        border: 2px solid #313131;
       }
 
       .startup-table tr {
@@ -655,7 +655,7 @@
       }
 
       .startup-table td > a {
-        color: white;
+        color: #313131;
       }
 
       .table-header {
@@ -671,8 +671,8 @@
             height: 100vh;
             left: 0px;
             top: 0px;
-            background-color: #000000;
-            border-right: 2px solid #454545;
+            background-color: #F4F4F4;
+            border-right: 2px solid #DCDCDC;
             font-family: "Graphik Bold";  
             vertical-align: middle;
             text-align: center;
@@ -697,8 +697,7 @@
       }
 
       .left-sidebar-header img {
-        width: 40px;
-        height: 40px;
+        width: 100px;
         object-fit: contain;
       }
 
@@ -716,7 +715,7 @@
         align-items: center;
         justify-content: center;
         flex-direction: column-reverse;
-        color: #787878;
+        color: #C3C3C3;
         margin: auto;
       }
 
@@ -730,7 +729,7 @@
       }
 
       .left-sidebar-btn.active {
-        color: #DDDDDD;
+        color: #313131;
     }
 
     .popup-bg {
@@ -1078,7 +1077,7 @@
 
   /* Change the background color of the dropdown button when the dropdown content is shown */
   .dropdown-bar-chart:hover .dropbtn-b {
-    background-color: #132A54;
+    background-color: #247DC5;
   }
 
   .svg-bar-container {
@@ -1337,7 +1336,7 @@
       </div>
     <div class="left-sidebar">
       <div class="left-sidebar-header">
-        <img src="assets/logo-.png">
+        <img src="assets/logo.png">
       </div>
 
       <div class="left-sidebar-buttons">
@@ -1399,7 +1398,7 @@
 
           <div class="dropdown-client">
             <button class="dropbtn">
-                <i class="arrow down"></i> Select Client Served
+                Select Client Served  <i class="arrow down"></i>
               </button>
               <div class="dropdown-content" id="client-selector"></div>
           </div>
@@ -1421,6 +1420,8 @@
           height = 860,
           innerRadius = 50,
           outerRadius = 300,
+          nodeRadius = 2.6,
+          nodeOtherWidth = 5.5,
           keySize = 10,
           keySpacing = 10,
           radial = "year",
@@ -1668,11 +1669,11 @@
   
               function country_hover(d, i) {
                 d3.selectAll(".country-circle")
-                  .attr("fill", "#01AAFF")
-                  .attr("stroke", "#01AAFF");
+                  .attr("fill", "#7DCCFF")
+                  .attr("stroke", "#7DCCFF");
                 d3.select(this)
-                  .attr("fill", "#132A54")
-                  .attr("stroke", "#132A54");
+                  .attr("fill", "#247DC5")
+                  .attr("stroke", "#247DC5");
                 var tooltip = "<div>" + d.properties.name + "<\/div>";
                 tooltip += "<div>Startups: " + d.properties.startups + "<\/div>";
                 d3.select(".map-tooltip")
@@ -1908,7 +1909,7 @@
               .append("path")
               .classed("segment-band", true)
               .attr("d", segmentLabelBandArc)
-              .attr("fill", "#01AAFF")
+              .attr("fill", "#7DCCFF")
               .each(function(d, i) {
                 var firstArcSection = /(^.+?)L/;
                 var newArc = firstArcSection.exec(d3.select(this).attr("d"))[1];
@@ -2005,7 +2006,7 @@
                           .attr("class", "nodes")
                           .attr("r", function(d) {
                             if (d["Funding Stage"] !== "Acquired") {
-                              return 2;
+                              return nodeRadius;
                             }
                           })
                           .attr("opacity", function(d) {
@@ -2059,14 +2060,14 @@
                           })
                           .attr("width", function(d) {
                             if (d["Funding Stage"] === "Acquired") {
-                              return 5.5;
+                              return nodeOtherWidth
                             } else {
                               return 0;
                             }
                           })
                           .attr("height", function(d) {
                             if (d["Funding Stage"] === "Acquired") {
-                              return 5.5;
+                              return nodeOtherWidth
                             } else {
                               return 0;
                             }
@@ -2333,7 +2334,6 @@
                 .classed("country-circle", true)
                 .attr("r", function(d) {
                   if (d.properties.startups > 0) {
-                      
                     return countryCircleScale(d.properties.startups);
                   }
                 })
@@ -2343,8 +2343,8 @@
                 .attr("cy", function(d, i) {
                   return leftCentroids[i][1];
                 })
-                .attr("fill", "#01AAFF")
-                .attr("stroke", "#01AAFF")
+                .attr("fill", "#7DCCFF")
+                .attr("stroke", "#7DCCFF")
                 .on("mouseover", country_hover)
                 .on("click", country_click)
   
@@ -2729,7 +2729,6 @@
             var outerChartPie = d3
               .pie()
               .value(function(d) {
-                console.log('d', d)
                 var number_of_opp_spaces = [
                   ...new Set(
                     d.value.values.map(function(v) {
@@ -2776,6 +2775,7 @@
                 filters.type = d
                 update_opacity();
                 clientFilter = d;
+                d3.select(".dropdown-client").select(".dropbtn").html(d + " <i class='arrow down'> <\/i>")
               });
 
             // Bar Chart:
@@ -2802,7 +2802,7 @@
               .enter()
               .append("path")
               .attr("d", themeArc)
-              .attr("fill", "#132A54")
+              .attr("fill", "#247DC5")
               .style("stroke", "white")
               .style("stroke-width", "2px")
               .each(function(d, i) {
@@ -2966,7 +2966,7 @@
                   d.data.value.key.toLowerCase().replace(/ /g, "-") + "-band"
                 );
               })
-              .attr("fill", "#01AAFF")
+              .attr("fill", "#7DCCFF")
               .each(function(d, i) {
                 var firstArcSection = /(^.+?)L/;
                 var newArc = firstArcSection.exec(d3.select(this).attr("d"))[1];
@@ -3250,7 +3250,7 @@
               .on("mouseover", function(d) {
                 keyMouseOver(d, "color");
               })
-              .on("mouseout", keyMouseOut)
+              //.on("mouseout", keyMouseOut)
               .on("click", function(d) {
                 if (filterKey === d) {
                   filterKey = "";
@@ -3844,11 +3844,10 @@
               })
               .attr("class", "nodes")
               .attr("r", function(d) {
-                
                 if (
                     d["Funding Stage"] !== "Acquired"
                 ) {
-                  return 2;
+                  return nodeRadius;
                 }
               })
               .attr("cx", function(d) {
@@ -3913,14 +3912,14 @@
               })
               .attr("width", function(d) {
                 if (d["Funding Stage"] === "Acquired") {
-                  return 5.5;
+                  return nodeOtherWidth
                 } else {
                   return 0;
                 }
               })
               .attr("height", function(d) {
                 if (d["Funding Stage"] === "Acquired") {
-                  return 5.5;
+                  return nodeOtherWidth
                 } else {
                   return 0;
                 }
@@ -3949,6 +3948,8 @@
               } */
   
             function updateNodes(type, filterKey) {
+              console.log('type', type)
+              console.log('filterkey', filterKey)
               if (filterKey === "") {
                 data.forEach(function(d) {
                   d.opacity = 1;
@@ -4036,9 +4037,11 @@
                 filterKey !== "" &&
                 type === "key"
               ) {
+                
                 nodes.attr("opacity", function(v) {
                   if (fundingCategoryScale(v["Funding Stage"]) === filterKey) {
                     v.opacity = 1;
+                    console.log('here')
                   } else {
                     v.opacity = 0.3;
                   }
@@ -4372,7 +4375,7 @@
                     d.hide === false &&
                     (d["Global"] === geotype || geotype === "All Startups")
                   ) {
-                    var endR = 2;
+                    var endR = nodeRadius;
                   } else {
                     var endR = 0;
                   }
@@ -4429,7 +4432,7 @@
                     d.hide === false &&
                     (d["Global"] === geotype || geotype === "All Startups")
                   ) {
-                    var endWidth = 5.5;
+                    var endWidth = nodeOtherWidth
                   } else {
                     var endWidth = 0;
                   }
@@ -4446,7 +4449,7 @@
                     d.hide === false &&
                     (d["Global"] === geotype || geotype === "All Startups")
                   ) {
-                    var endHeight = 5.5;
+                    var endHeight = nodeOtherWidth
                   } else {
                     var endHeight = 0;
                   }
@@ -4465,7 +4468,7 @@
                   ) {
                     var endY = 0;
                   } else {
-                    var endY = 7;
+                    var endY = nodeOtherWidth*1.5
                   }
                   var i = d3.interpolate(startY, endY);
                   return function(t) {
@@ -4531,7 +4534,7 @@
                       "#9368B7", "#9BC53D", "#122C34"]) */
 
                       var colorScale = d3.scaleOrdinal().domain(x.domain())
-                      .range(["#01AAFF"])
+                      .range(["#7DCCFF"])
 
                     var barX = d3.scaleBand()
                     .domain(fundHist.map(function(d) {
@@ -4643,7 +4646,7 @@
                   "#9368B7", "#9BC53D", "#122C34"]) */
 
                   var colorScale = d3.scaleOrdinal().domain(x.domain())
-                  .range(["#01AAFF"])
+                  .range(["#7DCCFF"])
 
                   var y = d3.scaleLinear()
                   .range([bar_height-50, 50])
@@ -4837,7 +4840,7 @@
                 .paddingInner(0.25);
 
                 var colorScale = d3.scaleOrdinal().domain(x.domain())
-                .range(["#01AAFF"])
+                .range(["#7DCCFF"])
 
                 var y = d3.scaleLinear()
                 .range([bar_height-50, 50])
@@ -5804,7 +5807,7 @@
                     .append("path")
                     .classed("segment-band", true)
                     .attr("d", segmentLabelBandArc)
-                    .attr("fill", "#01AAFF")
+                    .attr("fill", "#7DCCFF")
   
                   var tmpLabels = tmp_chartSVG
                     .append("g")
@@ -5892,7 +5895,7 @@
                     .attr("class", "nodes")
                     .attr("r", function(d) {
                       if (d["Funding Stage"] !== "Acquired") {
-                        return 2;
+                        return nodeRadius;
                       }
                     })
                     .attr("opacity", function(d) {
@@ -5941,14 +5944,14 @@
                     })
                     .attr("width", function(d) {
                       if (d["Funding Stage"] === "Acquired") {
-                        return 5.5;
+                        return nodeOtherWidth
                       } else {
                         return 0;
                       }
                     })
                     .attr("height", function(d) {
                       if (d["Funding Stage"] === "Acquired") {
-                        return 5.5;
+                        return nodeOtherWidth
                       } else {
                         return 0;
                       }
