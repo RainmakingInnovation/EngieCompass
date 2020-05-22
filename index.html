@@ -2741,7 +2741,9 @@
                 ];
                 return number_of_opp_spaces.length;
               })
-              //.sort(tempOrder);
+              .sort(function(a, b) {
+                return d3.ascending(a.value.key, b.value.key)
+              });
   
             var outerChartPieData = outerChartPie(d3.entries(tempOrder));
 
