@@ -5,6 +5,14 @@
     <title>Dashboard</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.5/leaflet.js"></script>
+    <script src="https://api.mapbox.com/mapbox.js/v3.3.0/mapbox.js"></script>
+    <script src="https://d3js.org/d3-queue.v3.min.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox.js/v3.2.1/mapbox.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
     <script src="https://cdn.rawgit.com/eligrey/canvas-toBlob.js/f1a01896135ab378aa5c0118eadd81da55e698d8/canvas-toBlob.js"></script>
     <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
         <script
@@ -559,7 +567,12 @@
         -webkit-transform: rotate(45deg);
       }
 
-            #map {
+      #map {
+      position: relative;
+      outline: none;
+      overflow: hidden;
+      height: 100%;
+      width: 910px;
       }
 
       .bg {
@@ -587,6 +600,7 @@
         top: 0px;
       }
 
+      .city-circle,
       .country-circle {
         fill-opacity: 0.3;
         stroke-width: 3px;
@@ -1095,7 +1109,8 @@
 
   .map-container {
     grid-column: 2 / span 1;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
+    position: relative;
   }
 
   .tick > line {
@@ -1433,7 +1448,7 @@
           clientFilter = "All Startups",
           geoFilter = "All Startups",
           filters = {type: "All Startups", geotype: "All Startups"}
-          logoPath = "",
+          logoPath = "assets/engie_logo.png",
           titleLogoWidth = 80,
           titleLogoHeight = 50,
           hoverOn = 0;
@@ -1445,6 +1460,12 @@
           popupMode = {"page": "none", "type": "none"},
           indexTracker = {},
           indexTrackerYear = {};
+
+      // mapbox access token
+      const accessToken =
+        "pk.eyJ1Ijoid2F5ZGVoZXJtYW4iLCJhIjoiY2s5ZGtvMXpoMDRjajNscWcwMm9pZnR5ayJ9.ZwyeZ2ykn8jZac12i4FEqA";
+
+      L.mapbox.accessToken = accessToken;
 
     var categoryFontObject = [
       { name: 'themeFont',
@@ -1527,38 +1548,17 @@
           .attr("y", (-height * 4.55) / 10)
           .style("display", "none")
   
-        var leftProjection = d3
-          .geoMercator()
-          .translate([leftWidth / 2, leftHeight / 2])
-          .center([30, 40.7])
-          .scale([150]);
-  
-        var leftSVG = d3
-          .select("#map")
-          .append("svg")
-          .attr("width", leftWidth)
-          .attr("height", leftHeight);
-  
-        leftSVG
-          .append("rect")
-          .attr("fill", "#CBCBCB")
-          .attr("width", leftWidth)
-          .attr("height", leftHeight);
-  
         d3.select(".map-container").style("display", "none")
         d3.select(".map-tooltip").style("display", "none")
-  
-        var leftG = leftSVG.append("g");
-  
-        var leftPath = d3.geoPath().projection(leftProjection);
-  
+
         var chartLogo = chartSVG
           .append("image")
           .attr("xlink:href", logoPath)
           .attr("width", titleLogoWidth)
           .attr("height", titleLogoHeight)
           .attr("y", -titleLogoHeight / 2)
-          .attr("x", -titleLogoWidth / 2); 
+          .attr("x", -titleLogoWidth / 2)
+          .style("display", "none")
   
         d3.csv(
           "https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1580022135&single=true&output=csv"
@@ -1571,14 +1571,47 @@
 
           console.log('desc', desc)
 
+          var transform = d3.geoTransform({ point: projectPoint }),
+            path = d3.geoPath().projection(transform);
+
+            d3.select("#map").attr("width", "800px").attr("height", "650px")
+
+          var map = new L.Map("map", {
+            center: [0, 0],
+            zoom: 2,
+            minZoom: 2,
+            maxZoom: 6,
+            }).whenReady(function() {
+              setTimeout(function(){ 
+                console.log('trigger resize')
+                map.invalidateSize(true)}, 400);
+              //L.Map.invalidateSize()
+            }).addLayer(
+              new L.TileLayer(
+                "https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/{z}/{x}/{y}?access_token=" +
+                  accessToken,
+                {
+                  attribution:
+                    '© <a href="https://apps.mapbox.com/feedback/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                }
+              )
+            );
+
+
+
               spinner.stop();
               //d3.select("#button-16").style("display", "block")
               d3.select("#button-17").style("display", "block")
               d3.select(".dropdown-client").style("display", "inline-block")
               d3.select("#save-button").style("display", "block")
               d3.select(".chart-title").style("display", "")
+              chartLogo.style("display", "block")
 
               d3.json("assets/world_countries.json").then(function(json) {
+
+                d3.csv("assets/worldcities.csv").then(function(cityData) {
+
+                  console.log('cityData', cityData)
 
               
 
@@ -1634,6 +1667,19 @@
               return d["Maturity"] !== "";
             });*/
 
+            data.forEach(function(v) {
+              cityData.forEach(function(w) {
+                if (v.City == w.city) {
+                  v.cityLat = +w.lat
+                  v.cityLng = +w.lng
+                }
+              })
+              if (v.cityLat == null) {
+                  v.cityLat = 0
+                  v.cityLng = 0
+              }
+            })
+
 
             
               json.features.push({"type": "features", "properties": {"name": "Singapore"}, "geometry": {"type": "Polygon", "coordinates": [[0, 0]]}})
@@ -1678,7 +1724,7 @@
                   .attr("stroke", "#247DC5");
                 var tooltip = "<div>" + d.properties.name + "<\/div>";
                 tooltip += "<div>Startups: " + d.properties.startups + "<\/div>";
-                d3.select(".map-tooltip")
+                /*d3.select(".map-tooltip")
                   .html(tooltip)
                   .style("top", function() {
                     return leftCentroids[i][1] + "px";
@@ -1686,7 +1732,7 @@
                   .style("left", function() {
                     return leftCentroids[i][0] + "px";
                   })
-                  .style("display", "");
+                  .style("display", "");*/
   
                 d3.select(".sidebar-title").html(d.properties.name);
   
@@ -2256,24 +2302,16 @@
 
               }
 
-  
-              var leftCentroids = json.features.map(function(feature) {
-                return leftPath.centroid(feature);
-              });
-  
-  
-  
-              // manual adjustments to country centroids:
-              leftCentroids[6] = [499.3566464049186, 484.20930510242];
-              leftCentroids[121] = [381.8299314691847, 98.47135868701795];
-              
-              leftCentroids[178] = [708, 370]
+          /* Initialize the SVG layer */
+              var svgLayer = L.svg();
+              svgLayer.addTo(map);
 
-              leftCentroids[167] = [200, 330]
-              leftCentroids[28] = [493, 304];
-              leftCentroids[177] = [743, 438]
-
-              leftCentroids[170] = [756, 410];
+              var geocoder = L.mapbox.geocoder("mapbox.places");
+  
+              var mapSvg = d3.select("#map").select("svg").style("pointer-events", "auto")
+              var mapG = d3.select("#map").select("svg").append("g");
+              mapG.attr("class", "leaflet-zoom-hide");
+  
   
               data_country = d3
                 .nest()
@@ -2297,7 +2335,7 @@
                 });
               });
   
-              var countries = leftG
+              /*var countries = leftG
                 .selectAll(".country")
                 .data(json.features)
                 .enter()
@@ -2307,7 +2345,7 @@
                 .attr("id", function(d) {
                   return "country_" + d.properties.name.replace(/ /g, "-");
                 })
-                .attr("fill", "#EFEFEF");
+                .attr("fill", "#EFEFEF");*/
   
               json.features.forEach(function(w) {
                 w.properties.startups = 0;
@@ -2329,8 +2367,35 @@
               .domain([1,max_country])
               .range([2.6, 30]);
   
-              leftG
-                .selectAll("circle")
+ 
+              json.features = json.features.filter(function(d) {
+                return d.geometry.coordinates[0].length > 2
+              })
+
+
+                  mapG
+                  .selectAll(".city-circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                  .classed("city-circle", true)
+                  .attr("r", function(d) {
+                    return 6
+                })
+                  .attr("cx", function(d, i) {
+                  return map.latLngToLayerPoint(new L.LatLng(d.cityLat, d.cityLng)).x
+                })
+                .attr("cy", function(d, i) {
+                    return map.latLngToLayerPoint(new L.LatLng(d.cityLat, d.cityLng)).y
+                })
+                .style("cursor", "pointer")
+                .attr("fill", "#7DCCFF")
+                .attr("stroke", "#7DCCFF")
+                .style("visibility", "hidden")
+
+
+                  mapG
+                .selectAll(".country-circle")
                 .data(json.features)
                 .enter()
                 .append("circle")
@@ -2341,15 +2406,85 @@
                   }
                 })
                 .attr("cx", function(d, i) {
-                  return leftCentroids[i][0];
+                  let arr = d.geometry.coordinates[0]
+                  if (arr.length < 2) {
+                    arr = d.geometry.coordinates[0][0]
+                  }
+                  if (arr != [0, 0]) {
+                  return map.latLngToLayerPoint(new L.LatLng(center(arr)[1], center(arr)[0])).x
+                  }
+
                 })
                 .attr("cy", function(d, i) {
-                  return leftCentroids[i][1];
+                  let arr = d.geometry.coordinates[0]
+                  if (arr.length < 2) {
+                    arr = d.geometry.coordinates[0][0]
+                  }
+                  if (arr != [0,0]) {
+                    return map.latLngToLayerPoint(new L.LatLng(center(arr)[1], center(arr)[0])).y
+                }
+
                 })
                 .attr("fill", "#7DCCFF")
                 .attr("stroke", "#7DCCFF")
+                .style("cursor", "pointer")
                 .on("mouseover", country_hover)
-                .on("click", country_click)
+                //.on("click", country_click)
+
+
+                function reset(e) {
+                  console.log(e.target._zoom)
+                mapG.selectAll(".country-circle")
+                .attr("cx", function(d, i) {
+                  let arr = d.geometry.coordinates[0]
+                  if (arr.length < 2) {
+                    arr = d.geometry.coordinates[0][0]
+                  }
+                  if (arr != [0, 0]) {
+                  return map.latLngToLayerPoint(new L.LatLng(center(arr)[1], center(arr)[0])).x
+                  }
+
+                })
+                .attr("cy", function(d, i) {
+                  let arr = d.geometry.coordinates[0]
+                  if (arr.length < 2) {
+                    arr = d.geometry.coordinates[0][0]
+                  }
+                  if (arr != [0,0]) {
+                    return map.latLngToLayerPoint(new L.LatLng(center(arr)[1], center(arr)[0])).y
+                }
+
+                })
+                .style("visibility", function() {
+                  if (e.target._zoom <= 3) {
+                    return "visible"
+                  } else {
+                    return "hidden"
+                  }
+                })
+
+                 mapG.selectAll(".city-circle")
+                                   .attr("cx", function(d, i) {
+                  return map.latLngToLayerPoint(new L.LatLng(d.cityLat, d.cityLng)).x
+                })
+                .attr("cy", function(d, i) {
+                    return map.latLngToLayerPoint(new L.LatLng(d.cityLat, d.cityLng)).y
+                })
+                .style("visibility", function() {
+                  if (e.target._zoom > 3) {
+                    return "visible"
+                  } else {
+                    return "hidden"
+                  }
+                })
+              }
+
+            map.on("zoom", function(e) {
+              reset(e)
+            })
+
+
+
   
               // END::END
   
@@ -6021,6 +6156,7 @@
                     d3.select("#control-container").style("display", "none")
                     d3.select("#hover-info-container").style("display", "none")
                     d3.select("#save-button-container").style("display", "none")
+                     map.invalidateSize()
                 } else {
                   d3.select(".map-container").style("display", "none")
                   d3.select(".map-tooltip").style("display", "none");
@@ -6042,7 +6178,7 @@
                 d3.select("#map-toggle-btn").attr("class", "left-sidebar-btn active")
                 d3.select("#radar-toggle-btn").attr("class", "left-sidebar-btn")
                 d3.select("body").style("background-color", "#CBCBCB")
-
+               
               toggle_map("on")
             })
   
@@ -6148,6 +6284,7 @@
                 element.insertBefore(styleElement, refNode);
               }
             }
+          });
           });
         })
         });
@@ -6492,6 +6629,25 @@
             return [tmp_x, tmp_y];
           }
         }
+        function projectPoint(x, y) {
+        var point = map.latLngToLayerPoint(new L.LatLng(y, x));
+        this.stream.point(point.x, point.y);
+      }
+
+      var center = function (arr)
+        {
+            var minX, maxX, minY, maxY;
+            for (var i = 0; i < arr.length; i++)
+            {
+                minX = (arr[i][0] < minX || minX == null) ? arr[i][0] : minX;
+                maxX = (arr[i][0] > maxX || maxX == null) ? arr[i][0] : maxX;
+                minY = (arr[i][1] < minY || minY == null) ? arr[i][1] : minY;
+                maxY = (arr[i][1] > maxY || maxY == null) ? arr[i][1] : maxY;
+            }
+            return [(minX + maxX) / 2, (minY + maxY) / 2];
+        }
+
+
       </script>
   
   </body>
