@@ -1613,8 +1613,10 @@
             
             var filteredCountries = ["England", "Ireland", "Singapore", "USA"]
             data = data.filter(function(d) {
-              return filteredCountries.indexOf(d["Location"] < 0)
+              return filteredCountries.indexOf(d["Location"]) < 0
             })
+
+            console.log('filtered data', data)
 
             data = data.filter(function(d) {
               return d["Opportunity Space"] !== "" && d["Opportunity Space"] !== "x";
@@ -4809,7 +4811,6 @@
                 }
 
                   if (type === "Maturity") {
-                    console.log('bar_data', bar_data)
                   var maturityOrder = [
                   "Nascent", "Emerging", "Mature"]
                   function maturitySort(a, b) {
@@ -4837,7 +4838,6 @@
                     return d.Maturity != ""
                   }) )
 
-                  console.log('maturity_data', maturity_data)
                   
 
                   var maxVal = d3.max(maturity_data, function(d) {
@@ -5109,7 +5109,6 @@
             }
   
             function hoverInfoFunction(segment_data, clicked = "") {
-              console.log(segment_data)
               var segmentDesc;
   
               desc.forEach(function(v) {
