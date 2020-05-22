@@ -5442,9 +5442,21 @@
               }
             }
 
-            function showNodeTooltip(d) {
+            function showNodeTooltip(d) {              
+              const fundingList = ["Unfunded"]
+              let fundingVal = 0
+              if (fundingList.indexOf(d["Funding Stage"]) < 0) {
+                if (d["Total funding (US$)"] == 0) {
+                  fundingVal = "Undisclosed"
+                } else {
+                  fundingVal = "$" + formatFunding(d["Total funding (US$)"])
+                }
+              } else {
+                fundingVal = "$" + formatFunding(d["Total funding (US$)"])
+              }
+
               d3.select(".node-tooltip-title").text(d["Startup"]);
-              d3.select(".node-tooltip-funding").text("Total Funding: $" + formatFunding(d["Total funding (US$)"]));
+              d3.select(".node-tooltip-funding").text("Total Funding: " + (fundingVal));
               d3.select(".node-tooltip-description").text(d["Business Description"].replace(/�۪/g, "'"));
 
               d3.select(".node-tooltip")
