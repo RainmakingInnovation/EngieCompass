@@ -1649,8 +1649,6 @@
               return filteredCountries.indexOf(d["Location"]) < 0
             })
 
-            console.log('filtered data', data)
-
             data = data.filter(function(d) {
               return d["Opportunity Space"] !== "" && d["Opportunity Space"] !== "x";
             });
@@ -1666,10 +1664,16 @@
              data = data.filter(function(d) {
               return d["Maturity"] !== "";
             });*/
+            data_city = d3
+            .nest()
+            .key(function(d) {
+              return d.City;
+            })
+            .entries(data);
 
-            data.forEach(function(v) {
+            data_city.forEach(function(v) {
               cityData.forEach(function(w) {
-                if (v.City == w.city) {
+                if (v.key == w.city) {
                   v.cityLat = +w.lat
                   v.cityLng = +w.lng
                 }
@@ -1679,8 +1683,6 @@
                   v.cityLng = 0
               }
             })
-
-
             
               json.features.push({"type": "features", "properties": {"name": "Singapore"}, "geometry": {"type": "Polygon", "coordinates": [[0, 0]]}})
               json.features.push({"type": "features", "properties": {"name": "Bahrain"}, "geometry": {"type": "Polygon", "coordinates": [[0, 0]]}})
@@ -1714,25 +1716,97 @@
                 }
                 return modes;
               }
-  
-              function country_hover(d, i) {
-                d3.selectAll(".country-circle")
-                  .attr("fill", "#7DCCFF")
-                  .attr("stroke", "#7DCCFF");
-                d3.select(this)
-                  .attr("fill", "#247DC5")
-                  .attr("stroke", "#247DC5");
-                var tooltip = "<div>" + d.properties.name + "<\/div>";
-                tooltip += "<div>Startups: " + d.properties.startups + "<\/div>";
-                /*d3.select(".map-tooltip")
+
+              function city_hover(d, i) {
+                d3.selectAll(".city-circle").attr("fill", function(v) {
+                  if (d.key == v.key) {
+                    return "#247DC5"
+                  } else {
+                    return "#7DCCFF"
+                  }
+                }).attr("stroke", function(v) {
+                  if (d.key == v.key) {
+                    return "#247DC5"
+                  } else {
+                    return "#7DCCFF"
+                  }
+                })
+
+                var tooltip = "<div>" + d.key + "<\/div>";
+                tooltip += "<div>Startups: " + d.values.length + "<\/div>";
+                d3.select(".map-tooltip")
                   .html(tooltip)
                   .style("top", function() {
-                    return leftCentroids[i][1] + "px";
+                    return d3.event.y + "px";
                   })
                   .style("left", function() {
-                    return leftCentroids[i][0] + "px";
+                    return (d3.event.x-136) + "px";
                   })
-                  .style("display", "");*/
+                  .style("display", "");
+                
+                d3.select(".sidebar-title").html(d.key);
+
+                startup_list = [];
+                d.values.forEach(function(w) {
+                    var obj = {
+                      "Startup": w["Startup"],
+                      Funding: w["Total funding (US$)"],
+                      Website: w["URL"],
+                      "Founded": w["Founded"]
+                    };
+                    startup_list.push(obj);
+                });
+                var table = "";
+                table += "<table class='startup-table'>";
+                  table +=
+                    "<tr class='table-header'><td>Company:<\/td><td>Funding:<\/td><td>Founded Year:<\/td><\/tr>"
+                startup_list.forEach(function(v) {
+                  table +=
+                    "<tr><td><a href='" + v.Website + "' target='_blank'>" +
+                    v["Startup"] +
+                    "</a><\/td><td>$" +
+                      formatFunding(v.Funding) +
+                    "<\/td><td>" +
+                    v["Founded"] +
+                    "<\/td><\/tr>";
+                });
+                table += "<\/table>";
+                d3.select("#startup-list").html(table);
+
+              }
+
+
+  
+              function country_hover(d, i) {
+
+                d3.selectAll(".country-circle")
+                  .attr("fill", function(v) {
+                    if (v.properties.name === d.properties.name) {
+                      return "#247DC5"
+                    } else {
+                      return "#7DCCFF"
+                    }
+                    
+                  })
+                  .attr("stroke", function(v) {
+                    if (v.properties.name === d.properties.name) {
+                      return "#247DC5"
+                    } else {
+                      return "#7DCCFF"
+                    }
+                  });
+ 
+                var tooltip = "<div>" + d.properties.name + "<\/div>";
+                tooltip += "<div>Startups: " + d.properties.startups + "<\/div>";
+                d3.select(".map-tooltip")
+                  .html(tooltip)
+                  .style("top", function() {
+                    return d3.event.y + "px";
+                  })
+                  .style("left", function() {
+                    return (d3.event.x-136) + "px";
+                  })
+                  .style("display", "");
   
                 d3.select(".sidebar-title").html(d.properties.name);
   
@@ -1742,7 +1816,7 @@
                     var obj = {
                       "Startup": w["Startup"],
                       Funding: w["Total funding (US$)"],
-                      Website: w["Website"],
+                      Website: w["URL"],
                       "Founded": w["Founded"]
                     };
                     startup_list.push(obj);
@@ -2278,12 +2352,38 @@
                   })
               }
 
+              function city_click(d) {
+                d3.select(".popup-container").attr("class", "popup-container added")
+                d3.select(".popup-bg").style("display", "")
+                d3.select(".popup-section-a").style("display", "none")
+                d3.select(".popup-section-b").style("display", "")
+                d3.select(".analysis-btn").style("display", "none")
+                d3.select(".map-tooltip").style("display", "none")
+
+
+                bar_data = [];
+                d.values.forEach(function(w) {
+    
+                        var obj = {
+                            "Startup": w["Startup"],
+                            Funding: w["Total funding (US$)"],
+                            Website: w["URL"],
+                            'Founded': w["Founded"],
+                            'Maturity': w["Maturity"]
+                          };
+                          bar_data.push(obj);
+    
+                })
+                update_bar("Amount of Funding")
+              }
+
               function country_click(d) {
                 d3.select(".popup-container").attr("class", "popup-container added")
                 d3.select(".popup-bg").style("display", "")
                 d3.select(".popup-section-a").style("display", "none")
                 d3.select(".popup-section-b").style("display", "")
                 d3.select(".analysis-btn").style("display", "none")
+                d3.select(".map-tooltip").style("display", "none")
 
                 bar_data = [];
                 data.forEach(function(w) {
@@ -2291,7 +2391,7 @@
                         var obj = {
                             "Startup": w["Startup"],
                             Funding: w["Total funding (US$)"],
-                            Website: w["Website"],
+                            Website: w["URL"],
                             'Founded': w["Founded"],
                             'Maturity': w["Maturity"]
                           };
@@ -2375,12 +2475,14 @@
 
                   mapG
                   .selectAll(".city-circle")
-                  .data(data)
+                  .data(data_city)
                   .enter()
                   .append("circle")
                   .classed("city-circle", true)
                   .attr("r", function(d) {
-                    return 6
+                    if (d.values.length > 0) {
+                      return countryCircleScale(d.values.length)
+                    } 
                 })
                   .attr("cx", function(d, i) {
                   return map.latLngToLayerPoint(new L.LatLng(d.cityLat, d.cityLng)).x
@@ -2392,9 +2494,11 @@
                 .attr("fill", "#7DCCFF")
                 .attr("stroke", "#7DCCFF")
                 .style("visibility", "hidden")
+                .on("mouseover", city_hover)
+                .on("click", city_click)
 
 
-                  mapG
+                mapG
                 .selectAll(".country-circle")
                 .data(json.features)
                 .enter()
@@ -2428,12 +2532,14 @@
                 .attr("fill", "#7DCCFF")
                 .attr("stroke", "#7DCCFF")
                 .style("cursor", "pointer")
-                .on("mouseover", country_hover)
-                //.on("click", country_click)
+                .on("mouseover", function(d) {
+                  country_hover(d)
+                })
+                .on("click", country_click)
 
 
                 function reset(e) {
-                  console.log(e.target._zoom)
+                  d3.select(".map-tooltip").style("display", "none");
                 mapG.selectAll(".country-circle")
                 .attr("cx", function(d, i) {
                   let arr = d.geometry.coordinates[0]
@@ -2462,9 +2568,11 @@
                     return "hidden"
                   }
                 })
+                .attr("fill", "#7DCCFF")
+                .attr("stroke", "#7DCCFF");
 
                  mapG.selectAll(".city-circle")
-                                   .attr("cx", function(d, i) {
+                  .attr("cx", function(d, i) {
                   return map.latLngToLayerPoint(new L.LatLng(d.cityLat, d.cityLng)).x
                 })
                 .attr("cy", function(d, i) {
@@ -2477,6 +2585,8 @@
                     return "hidden"
                   }
                 })
+                .attr("fill", "#7DCCFF")
+                .attr("stroke", "#7DCCFF");
               }
 
             map.on("zoom", function(e) {
