@@ -1683,8 +1683,9 @@
             })
 
             function getLocation2(data, callback) {
+                console.log(data.key + ", " + data.values[0].Location)
 
-                  geocoder.query(data.key, function (error, point) {
+                  geocoder.query(data.key + ", " + data.values[0].Location, function (error, point) {
                     data.cityLat = point.latlng[0]
                     data.cityLng = point.latlng[1]
                   });
