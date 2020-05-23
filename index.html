@@ -571,8 +571,7 @@
       position: relative;
       outline: none;
       overflow: hidden;
-      height: 100%;
-      width: 910px;
+      height: 100%; 
       }
 
       .bg {
@@ -598,6 +597,7 @@
         border-left: 2px solid #DCDCDC;
         right: 0px;
         top: 0px;
+        z-index: 100;
       }
 
       .city-circle,
@@ -1567,23 +1567,19 @@
           "https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1462501778&single=true&output=csv"
           ).then(function(desc) {
 
-          console.log('data', data)
-
-          console.log('desc', desc)
-
           var transform = d3.geoTransform({ point: projectPoint }),
             path = d3.geoPath().projection(transform);
-
-            d3.select("#map").attr("width", "800px").attr("height", "650px")
+            
+            d3.select("#map").attr("width", (window.innerWidth) + "px").attr("height", "650px")
+              .style("width", (window.innerWidth) + "px")
 
           var map = new L.Map("map", {
-            center: [0, 0],
+            center: [0, 100],
             zoom: 2,
             minZoom: 2,
             maxZoom: 6,
             }).whenReady(function() {
               setTimeout(function(){ 
-                console.log('trigger resize')
                 map.invalidateSize(true)}, 400);
               //L.Map.invalidateSize()
             }).addLayer(
@@ -1611,7 +1607,6 @@
 
                 d3.csv("assets/worldcities.csv").then(function(cityData) {
 
-                  console.log('cityData', cityData)
 
               
 
@@ -1671,18 +1666,31 @@
             })
             .entries(data);
 
+            var q = d3.queue();
+            var geocoder = L.mapbox.geocoder("mapbox.places");
+
+
             data_city.forEach(function(v) {
               cityData.forEach(function(w) {
-                if (v.key == w.city) {
+                if (v.key == w.city && v.values[0].Location == w.country) {
                   v.cityLat = +w.lat
                   v.cityLng = +w.lng
                 }
               })
               if (v.cityLat == null) {
-                  v.cityLat = 0
-                  v.cityLng = 0
+                  q.defer(getLocation2, v);
               }
             })
+
+            function getLocation2(data, callback) {
+
+                  geocoder.query(data.key, function (error, point) {
+                    data.cityLat = point.latlng[0]
+                    data.cityLng = point.latlng[1]
+                  });
+
+              callback(null);
+            }
             
               json.features.push({"type": "features", "properties": {"name": "Singapore"}, "geometry": {"type": "Polygon", "coordinates": [[0, 0]]}})
               json.features.push({"type": "features", "properties": {"name": "Bahrain"}, "geometry": {"type": "Polygon", "coordinates": [[0, 0]]}})
@@ -2406,7 +2414,6 @@
               var svgLayer = L.svg();
               svgLayer.addTo(map);
 
-              var geocoder = L.mapbox.geocoder("mapbox.places");
   
               var mapSvg = d3.select("#map").select("svg").style("pointer-events", "auto")
               var mapG = d3.select("#map").select("svg").append("g");
@@ -2472,10 +2479,14 @@
                 return d.geometry.coordinates[0].length > 2
               })
 
-
+              q.awaitAll(function (error) {
+                if (error) throw error;
+                setTimeout(function () {
                   mapG
                   .selectAll(".city-circle")
-                  .data(data_city)
+                  .data(data_city.filter(function(v) {
+                    return v.cityLat != null
+                  }))
                   .enter()
                   .append("circle")
                   .classed("city-circle", true)
@@ -2537,6 +2548,11 @@
                 })
                 .on("click", country_click)
 
+                }, 2000);
+                });
+
+
+
 
                 function reset(e) {
                   d3.select(".map-tooltip").style("display", "none");
@@ -2591,6 +2607,10 @@
 
             map.on("zoom", function(e) {
               reset(e)
+            })
+
+            map.on("drag", function() {
+              d3.select(".map-tooltip").style("display", "none");
             })
 
 
@@ -3880,7 +3900,6 @@
                   if (nodeData[i].key === d["Opportunity Space"]) {
                     for (j = 0; j < nodeData[i].values.length; j++) {
                       if (nodeData[i].values[j].key === d["Maturity"]) {
-                        //console.log(nodeData[i].values[j])
 
                         var congestion = calcCongestion(
                           tmp_startAngleMin,
@@ -4061,7 +4080,6 @@
                 switchRadial();
               });
               d3.select("#button-17").on("change", function() {
-                console.log('button')
                 if (geoFilter === "All Startups") {
                   filters.geotype = "African"
                   update_opacity()
@@ -4196,8 +4214,6 @@
               } */
   
             function updateNodes(type, filterKey) {
-              console.log('type', type)
-              console.log('filterkey', filterKey)
               if (filterKey === "") {
                 data.forEach(function(d) {
                   d.opacity = 1;
@@ -4289,7 +4305,6 @@
                 nodes.attr("opacity", function(v) {
                   if (fundingCategoryScale(v["Funding Stage"]) === filterKey) {
                     v.opacity = 1;
-                    console.log('here')
                   } else {
                     v.opacity = 0.3;
                   }
@@ -4751,7 +4766,6 @@
                     
 
                     bar_data.forEach(function(v) {
-                      console.log('v', v)
                       if (v.Funding != 0) {
                         if (v.Funding.slice(0,1) == "$") {
                           v.Funding = v.Funding.slice(1)
