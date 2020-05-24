@@ -575,7 +575,7 @@
       }
 
       .bg {
-        background-color: #cbcbcb;
+        background-color: #CAD2D3;
         position: absolute;
         top: 0px;
         left: 0px;
@@ -1570,7 +1570,7 @@
           var transform = d3.geoTransform({ point: projectPoint }),
             path = d3.geoPath().projection(transform);
             
-            d3.select("#map").attr("width", (window.innerWidth) + "px").attr("height", "650px")
+            d3.select("#map").attr("width", (window.innerWidth) + "px").attr("height", (window.innerHeight) + "px")
               .style("width", (window.innerWidth) + "px")
 
           var map = new L.Map("map", {
@@ -6302,7 +6302,7 @@
             d3.select("#map-toggle-btn").on("click", function() {
                 d3.select("#map-toggle-btn").attr("class", "left-sidebar-btn active")
                 d3.select("#radar-toggle-btn").attr("class", "left-sidebar-btn")
-                d3.select("body").style("background-color", "#CBCBCB")
+                d3.select("body").style("background-color", "#CAD2D3")
                
               toggle_map("on")
             })
