@@ -1561,10 +1561,10 @@
           .style("display", "none")
   
         d3.csv(
-          "https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1580022135&single=true&output=csv"
+          "EduardoData - EngieRadar.csv"
         ).then(function(data) {
           d3.csv(
-          "https://cors-anywhere.herokuapp.com/https://docs.google.com/spreadsheets/d/e/2PACX-1vSafGm_gSEK_M6dTEcS3sd2N7CcehHPfg561BJtgzrHClIt5DH79yqHI1LpeOLbbwGob_Xi0kVUdxMB/pub?gid=1462501778&single=true&output=csv"
+          "EduardoData - EngieRadar-Definitions.csv"
           ).then(function(desc) {
 
           var transform = d3.geoTransform({ point: projectPoint }),
